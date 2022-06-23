@@ -3,9 +3,12 @@ import {Request, Response} from "express";
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
+import routes from "./src/server/routes/api";
 
 const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITE_TEST_BUILD
 
+
+  const app = express();
 
 
 async function createServer(
@@ -14,15 +17,11 @@ async function createServer(
 ) {
   const resolve = (p:string) => path.resolve(__dirname, p)
 
-  const indexProd = isProd
-      ? fs.readFileSync(resolve('client/index.html'), 'utf-8')
-      : ''
-
-  const app = express();
 
   const requestHandler = express.static(resolve('assets'));
   app.use(requestHandler)
   app.use('/assets', requestHandler)
+  app.use("/", routes);
 
 
 
@@ -55,40 +54,65 @@ async function createServer(
     )
   }
 
-  app.use('*', async (req: Request, res: Response) => {
+ app.use("*", async (req: Request, res: Response) => {
     try {
-      const url = req.originalUrl
+      const url = req.originalUrl;
+	  let serveApiOnly = process.env.NODE_ENGINE === 'api'
 
-      let template, render
-      if (!isProd) {
+      let render;
+	  // if server only or not
+      let template = fs.readFileSync(resolve(`${serveApiOnly ? 'views/api.ejs' : 'index.html'}`), "utf-8");
+	  
+      if (!isProd && process.env.NODE_ENV) {
         // always read fresh template in dev
-        template = fs.readFileSync(resolve('index.html'), 'utf-8')
-        template = await vite.transformIndexHtml(url, template)
-        render = (await vite.ssrLoadModule('/src/entry-server.tsx')).render
+        template = await vite.transformIndexHtml(url, template);
+		
+		// if server only, we don't load the react stuff
+        render = (await vite.ssrLoadModule(resolve(`./src/client/entry-${serveApiOnly ? 'empty' : 'server'}.tsx`))).render;
       } else {
-        template = indexProd
-        render = require('./server/entry-server.js').render
+        render = require(resolve("./server/entry-server.js")).render;
       }
 
-      const context = {}
-      const appHtml = render(url, context)
+      const context = {};
+	  // dont serve react content but just a piece of html if on Api only
+      const appHtml = serveApiOnly ? '<div style="margin: 10% auto;width: 40%;font-size: 30px;">Welcome to our api</div>' : render(url, context);
 
-      const html = template.replace(`<!--app-html-->`, appHtml)
-
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
-    } catch (e:any) {
-      !isProd && vite.ssrFixStacktrace(e)
-      console.log(e.stack)
-      res.status(500).end(e.stack)
+      const html = template.replace(`<!--app-html-->`, appHtml);
+		
+		res.status(200).set({ "Content-Type": 'text/html' }).end(html);
+			
+    } catch (e: any) {
+      !isProd && vite.ssrFixStacktrace(e);
+      console.log(e.stack);
+      res.status(500).end(e.stack);
     }
-  })
+  });
 
-  return { app, vite }
+  return { app, vite };
 }
 
-createServer().then(({ app }) => {
-  const port = process.env.PORT || 7456;
-  app.listen(Number(port), "0.0.0.0", () => {
-    console.log(`App is listening on http://localhost:${port}`);
+
+const checkPort = (port: number, app: Application) =>
+  new Promise(resolve => {
+    app
+      .listen(port, "0.0.0.0", () => {
+        console.log(`Start listening application at http://localhost:${port}`);
+      })
+      .on("error", () => {
+        console.log(`App already running at http://localhost:${port}`);
+        resolve(false);
+      });
   });
+
+
+
+/* create a server and verify if port is already use : 
+	catch error  EADDRINUSE and can let the app working instead
+*/
+createServer().then(({ app: Application }) => {
+  const port = process.env.PORT ? Number(process.env.PORT) : 7456;
+  checkPort(Number(port), app);
 });
+
+
+export default app;

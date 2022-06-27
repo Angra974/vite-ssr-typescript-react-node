@@ -1,4 +1,4 @@
-# Portfolio with Vite Typescript React 18 SSR
+# Vite Typescript React 18 SSR
 
 Forked from [https://github.com/jonluca/vite-typescript-ssr-react](https://github.com/jonluca/vite-typescript-ssr-react)
 

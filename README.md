@@ -3,7 +3,7 @@
 Forked from [https://github.com/jonluca/vite-typescript-ssr-react](https://github.com/jonluca/vite-typescript-ssr-react)
 
 
-<p>If you want the vite ssr implementation witho the portfolio, get it here [V.E.R.T boilerplate](https://github.com/Angra974/vite-typescript-ssr-react18-portfolio)</p>
+<p>If you want the vite ssr implementation with the portfolio, get it here [V.E.R.T boilerplate](https://github.com/Angra974/vite-typescript-ssr-react18-portfolio)</p>
 
 [![Node CI](https://github.com/Angra974/vite-typescript-ssr-react18-portfolio/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Angra974/vite-typescript-ssr-react18-portfolio/actions/workflows/nodejs.yml)
 

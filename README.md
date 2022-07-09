@@ -7,7 +7,12 @@ Forked from [https://github.com/jonluca/vite-typescript-ssr-react](https://githu
 
 [![Node CI](https://github.com/Angra974/vite-typescript-ssr-react18-portfolio/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Angra974/vite-typescript-ssr-react18-portfolio/actions/workflows/nodejs.yml)
 
-A _blazingly_ modern web development stack with a portfolio inside as an exemple with Atomic design, Sass and/or with styled-components.
+A _blazingly_ modern web development stack.
+
+
+![video](docs/video.gif)
+
+
 This template repo tries to achieve the minimum viable example for each of the following:
 
 - [React 18](https://reactjs.org/blog/2020/10/20/react-v17.html)
